@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:gfe="http://www.springframework.org/schema/gemfire"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/gemfire http://www.springframework.org/schema/gemfire/spring-gemfire-1.8.xsd">
+
+	<gfe:client-cache id="gemfireCache" pool-name="default-pool"/>
+	
+	<gfe:pool id="default-pool" subscription-enabled="false">
+		<gfe:locator host="localhost" port="10000"/>
+	</gfe:pool>
+	
+	<gfe:client-region id="eventRegion" name="event" shortcut="PROXY" cache-ref="gemfireCache" pool-name="default-pool"/>	
+	
+	<bean class="io.pivotal.pde.sample.QueryEvents">
+		<property name="eventRegion" ref="eventRegion"/>
+	</bean>
+</beans>
