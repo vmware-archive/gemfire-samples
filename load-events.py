@@ -3,12 +3,14 @@ import faker
 import json
 import os
 import random
+import time
 
 REST_API_HOST='localhost'
-REST_API_PORT=10180
-REST_API_URL='/gemfire-api/v1/event'
+REST_API_PORT=10183
+REST_API_URL='/gemfire-api/v1/Event'
 EVENT_TYPE = 'io.pivotal.pde.sample.Event'
-count = 10000
+count = 200
+sleep = 1.0
 
 headers = dict()
 headers['Content-Type'] = 'application/json'
@@ -38,12 +40,15 @@ if __name__ == '__main__':
          
          jsonStr = json.dumps(json_event, indent=3)
          print 'PUTTING' + os.linesep + jsonStr 
-         conn.request('POST',REST_API_URL + '?key={0:06d}'.format(i), jsonStr, headers)
+         conn.request('PUT',REST_API_URL + '/{0:06d}'.format(i), jsonStr, headers)
          resp = conn.getresponse()
-         if resp.status != 201:
+         if resp.status != 200:
             raise Exception('An error occurred while putting event - REST API returned {0} {1}'.format(resp.status, resp.reason))
          
          resp.read()
+         
+         if sleep > 0:
+            time.sleep(sleep)
          
    finally:
       conn.close()

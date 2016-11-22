@@ -1,21 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:gfe="http://www.springframework.org/schema/gemfire"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:gfe="http://www.springframework.org/schema/gemfire" xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd
 		http://www.springframework.org/schema/gemfire http://www.springframework.org/schema/gemfire/spring-gemfire-1.8.xsd">
 
-	<gfe:client-cache id="gemfireCache" pool-name="default-pool"/>
-	
-	<gfe:pool id="default-pool" subscription-enabled="false">
-		<gfe:locator host="localhost" port="10000"/>
-	</gfe:pool>
-	
-	<gfe:client-region id="eventRegion" name="event" shortcut="PROXY" cache-ref="gemfireCache" pool-name="default-pool"/>	
-	
-	<bean class="io.pivotal.pde.sample.QueryEvents">
-		<property name="eventRegion" ref="eventRegion"/>
+	<bean class="com.gemstone.gemfire.pdx.ReflectionBasedAutoSerializer"
+		id="serializer">
+		<constructor-arg>
+			<value>io.pivotal.pde.sample.*</value>
+		</constructor-arg>
 	</bean>
+
+	<!-- durable-client-id is a number identifying a particular subscription 
+		queue to the sever durable-client-timeout the maximum amount of time to accumulate 
+		messages while this client is disconnected 259200 = 72 hrs -->
+	<gfe:client-cache id="gemfireCache" pool-name="default-pool"
+		durable-client-id="101" durable-client-timeout="259200" 
+		pdx-read-serialized="false" pdx-serializer-ref="serializer" />
+
+	<!-- subscription-redundancy specified the number of extra copies of the 
+		subscription queue to be saved on the server -->
+	<gfe:pool id="default-pool" subscription-enabled="true"
+		subscription-redundancy="1">
+		<gfe:locator host="localhost" port="10000" />
+	</gfe:pool>
+
+	<gfe:client-region id="eventRegion" name="event"
+		shortcut="PROXY" cache-ref="gemfireCache" pool-name="default-pool" />
+
+	<gfe:cq-listener-container pool-name="default-pool"
+		id="cqContainer" auto-startup="true">
+		<gfe:listener ref="cqListener" query="SELECT * FROM /Event"
+			durable="true" name="EventCQ" />
+	</gfe:cq-listener-container>
+
+	<bean id="cqListener" class="io.pivotal.pde.sample.SampleCqEventListener" />
+
+	<bean class="io.pivotal.pde.sample.QueryEvents">
+		<property name="eventRegion" ref="eventRegion" />
+	</bean>
+
 </beans>
