@@ -49,12 +49,12 @@ public class QueryEvents {
 			 * there are many ways to do this - just instantiating the context
 			 * directly in this case
 			 */
-			ApplicationContext ctx = new ClassPathXmlApplicationContext("context.xml");
+			ApplicationContext ctx = new ClassPathXmlApplicationContext("simple-context.xml");
 			QueryEvents qe = ctx.getBean(QueryEvents.class);
 			
 			int count = qe.query(type, state);
 			
-			System.out.println("" + count);
+			System.out.println(">>>" + count + " events with type = " + type + " state = " + state);
 		} catch(Exception x){
 			x.printStackTrace(System.err);
 		}

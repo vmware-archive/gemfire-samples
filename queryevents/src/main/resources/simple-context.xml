@@ -14,27 +14,20 @@
 		</constructor-arg>
 	</bean>
 
-	<!-- durable-client-id is a number identifying a particular subscription 
-		queue to the sever durable-client-timeout the maximum amount of time to accumulate 
-		messages while this client is disconnected 259200 = 72 hrs -->
 	<gfe:client-cache id="gemfireCache" pool-name="default-pool"
-		durable-client-id="101" durable-client-timeout="259200" 
 		pdx-read-serialized="false" pdx-serializer-ref="serializer" />
 
 	<!-- subscription-redundancy specified the number of extra copies of the 
 		subscription queue to be saved on the server -->
-	<gfe:pool id="default-pool" subscription-enabled="true"
-		subscription-redundancy="1">
+	<gfe:pool id="default-pool" subscription-enabled="false">
 		<gfe:locator host="localhost" port="10000" />
 	</gfe:pool>
 
-	<gfe:cq-listener-container pool-name="default-pool"
-		id="cqContainer" auto-startup="true">
-		<gfe:listener ref="cqListener" query="SELECT * FROM /Event"
-			durable="true" name="EventCQ" />
-	</gfe:cq-listener-container>
+	<gfe:client-region id="eventRegion" name="Event"
+		shortcut="PROXY" cache-ref="gemfireCache" pool-name="default-pool" />
 
-	<bean id="cqListener" class="io.pivotal.pde.sample.SampleCqEventListener" />
-
+	<bean class="io.pivotal.pde.sample.QueryEvents">
+		<property name="eventRegion" ref="eventRegion" />
+	</bean>
 
 </beans>
