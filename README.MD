@@ -10,7 +10,8 @@ _Set Up the Event Region_
    
 ```$GEMFIRE/bin/gfsh -e "connect --locator=localhost[10000]" -e "create region --name=event --type=PARTITION_REDUNDANT"```
 
-as a convenience, "gfsh.py" will call the gemfire script and connect automatically:
+as a convenience, "gfsh.py" will call the gemfire script and connect automatically.  Instead of the
+above command, you could also type:
 
 `python gfsh.py create region --name=event --type=PARTITION_REDUNDANT`
 

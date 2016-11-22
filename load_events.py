@@ -18,14 +18,14 @@ if __name__ == '__main__':
    
    conn = httplib.HTTPConnection(REST_API_HOST,REST_API_PORT)
    try:      
-      # conn.request('DELETE',REST_API_URL, None, headers )
-      # resp = conn.getresponse()
-      # if resp.status != 200:
-      #    raise Exception('An error occurred while clearing the event region - REST API returned {0} {1}'.format(resp.status, resp.reason))
-      # 
-      # resp.read()
+      #conn.request('DELETE',REST_API_URL, None, headers )
+      #resp = conn.getresponse()
+      #if resp.status != 200:
+      #   raise Exception('An error occurred while clearing the event region - REST API returned {0} {1}'.format(resp.status, resp.reason))
       
-      # print 'cleared event region'
+      #resp.read()
+      
+      #print 'cleared event region'
       
       for i in range(count):
          json_event = dict()
